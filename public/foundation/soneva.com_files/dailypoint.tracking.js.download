@@ -1,0 +1,198 @@
+﻿/**
+ * Funktion um User-ID aus URL oder Cookie auszulesen,
+ * Cookie zu erstellen und zu l�schen und
+ * Debug-Modus zu aktivieren. 
+ * @returns Array[URL zur tracking.php, User-ID, Debug]
+ */
+function linkTracker() {
+    var COOKIE_EXPIRES_IN_DAYS = 90;
+    var CUSTOMER_GUID = "subid";
+    var PROMOTION_ID = "promotion_id";
+    var RESGUID = "rid";
+    var CUSTOMER_GUID_COOKIE_NAME = "tracking_uid";
+    var PROMOTION_ID_COOKIE_NAME = "tracking_promotion";
+    var CLIENT_GUID = getGuidFromQuery();
+    var REQUEST_URL = "https://service.dailypoint.com/PublicRestService.svc/gettrackingdata/";
+    var LINKGUID = "lid";
+
+    var usedCookieBar = document.getElementById("o-overlay-subscribe") != null
+    var allowedCookie = false;
+    if (usedCookieBar) {
+        allowedCookie = "dismiss" == getCookie("cookieconsent_status");
+    } else {
+        allowedCookie = true;
+    }
+
+    //Code (User-ID) aus URL bzw.  Cookie auslesen und ggf. den Cookie �berschreiben
+    var code = null;
+    code = getCodeFromURL(CUSTOMER_GUID);
+
+    //wenn code in URL vorhanden & code in URL ungleich dem im Cookie
+    if (code != null && code != getCodeFromCookie()) {
+        //Wenn im noch kein Cookie gesetzt ist ODER ein Code im Cookie gesetzt ist und nicht schreibtgesch�tzt ist
+        if ((getCodeFromCookie() == null) || (getCodeFromCookie() != null)) {
+
+            setCookie(CUSTOMER_GUID_COOKIE_NAME, code);
+        }
+    } else if (code == null) {
+        code = getCodeFromCookie();
+    }
+
+    var promotionId = getCodeFromURL(PROMOTION_ID);
+    if (promotionId != null && promotionId != getPromotionIdFromCookie() && (getPromotionIdFromCookie() == null || getPromotionIdFromCookie() == 'undefined')) {
+        setCookie(PROMOTION_ID_COOKIE_NAME, promotionId);
+    } else if (promotionId == null) {
+        promotionId = getPromotionIdFromCookie();
+    }
+
+    var lid = null;
+    lid = getCodeFromURL(LINKGUID);
+
+    var rid = null;
+    rid = getCodeFromURL(RESGUID);
+
+    //Funktion um UID aus URL auszulesen
+    function getCodeFromURL(paramName) {
+
+        var regexS = "[\\?&]" + paramName + "=([^&#]*)";
+        var regex = new RegExp(regexS, "i");
+        var results = regex.exec(window.location.href);
+        if (results == null)
+            return null;
+        else {
+            results[1] = results[1].replace("%257B", "{");
+            results[1] = results[1].replace("%257D", "}");
+            results[1] = results[1].replace("%7B", "{");
+            results[1] = results[1].replace("%7D", "}");
+            return results[1];
+        }
+    }
+
+    //Funktion um Cookie zu setzen
+    function setCookie(cookieName, value) {
+        if (value !== null && allowedCookie == true) {
+            var expires = new Date();
+            expires.setDate(expires.getDate() + COOKIE_EXPIRES_IN_DAYS);
+            //Cookies werden nicht f�r localhost geschrieben -> Workaround f�r Chrome + FF -> nicht notwendig bei aufruf �ber 127.0.0.1
+            var hostname = location.hostname;
+            if (hostname == "localhost") {
+                hostname = "";
+            }
+
+            document.cookie = cookieName +
+                "=" +
+                value +
+                "; expires=" +
+                expires.toGMTString() +
+                "; path=" +
+                "/" +
+                "; domain=" +
+                hostname;
+        }
+    }
+    function getCookie(a) {
+        for (var b = a + "=", c = document.cookie.split(";"), d = 0; d < c.length; d++) {
+            for (var e = c[d];
+                " " === e.charAt(0);) e = e.substring(1);
+            if (0 === e.indexOf(b)) return e.substring(b.length, e.length);
+        }
+        return ""
+    }
+
+    //Funktion um UID aus Cookie auszulesen
+    function getCodeFromCookie() {
+
+        var i, x, y, cookies = document.cookie.split(";");
+        for (i = 0; i < cookies.length; i++) {
+            x = cookies[i].substr(0, cookies[i].indexOf("="));
+            y = cookies[i].substr(cookies[i].indexOf("=") + 1);
+            x = x.replace(/^\s+|\s+$/g, "");
+
+            x = x.replace("%257B", "{");
+            x = x.replace("%257D", "}");
+            x = x.replace("%7B", "{");
+            x = x.replace("%7D", "}");
+
+            y = y.replace("%257B", "{");
+            y = y.replace("%257D", "}");
+            y = y.replace("%7B", "{");
+            y = y.replace("%7D", "}");
+
+            if (x == CUSTOMER_GUID_COOKIE_NAME || x == "subscribe_dailypoint")
+                return y;
+        }
+        return null;
+    }
+
+    function getPromotionIdFromCookie() {
+        var i, x, y, cookies = document.cookie.split(";");
+        for (i = 0; i < cookies.length; i++) {
+            x = cookies[i].substr(0, cookies[i].indexOf("="));
+            y = cookies[i].substr(cookies[i].indexOf("=") + 1);
+            x = x.replace(/^\s+|\s+$/g, "");
+            if (x == PROMOTION_ID_COOKIE_NAME)
+                return y;
+        }
+        return null;
+    }
+
+    //Funktion um den guid Parameter aus der Script Src zu extrahieren
+    function getGuidFromQuery() {
+
+        var dailypointScript = document.getElementById("dailypointTracking");
+        var value = decodeURIComponent((RegExp("guid" + "=" + "(.+?)(&|$)").exec(dailypointScript.src) || [, ""])[1]);
+        return (value !== "null") ? value : false;
+    }
+
+
+    //suche nach Cookie-l�schen-parameter in URL (delcookie=1)
+    var regexsDelCookie = "[\\?&]delcookie=([^&#]*)";
+    var regexDelCookie = new RegExp(regexsDelCookie, "i"); //i -> case-insensitive
+    var resultsDelCookie = regexDelCookie.exec(window.location.href);
+    if (resultsDelCookie != null)
+        document.cookie = CUSTOMER_GUID_COOKIE_NAME + "=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;";
+    var arrayRet = [CLIENT_GUID, REQUEST_URL, code, promotionId, rid, lid];
+    return arrayRet;
+}
+
+
+//Erh�lt Array mit Request_URL, UID und Debugmodus
+var arrayRet = linkTracker();
+//START
+// If the User GUID is not null
+
+if (arrayRet[2] != null) {
+    //XMLHttpRequest (else-Zweig f�r IE5 und IE6)
+    var xhr = null;
+    if (window.XMLHttpRequest) {
+        xhr = new XMLHttpRequest();
+    } else {
+        xhr = new ActiveXObject("Microsoft.XMLHTTP");
+    }
+
+    // To format the old and false GUID 
+    arrayRet[2] = arrayRet[2].replace("%257B", "{");
+    arrayRet[2] = arrayRet[2].replace("%257D", "}");
+    arrayRet[2] = arrayRet[2].replace("%7B", "{");
+    arrayRet[2] = arrayRet[2].replace("%7D", "}");
+
+    var data = {
+        clientGuid: arrayRet[0],
+        userGuid: arrayRet[2],
+        promotionId: arrayRet[3],
+        resGuid: arrayRet[4],
+        linkGuid: arrayRet[5],
+        url: document.location.href
+    };
+
+    //var data = 'clientGuid=' + arrayRet[0] + '&userGuid=' + arrayRet[2] + '&url=' + document.location.href;
+
+    //POST-Request (Wenn Debugmodus aktiv -> synchroner Aufruf (warten auf Antwort -> R�ckmeldung ob loggen erfolgr.)
+
+    xhr.open("POST", arrayRet[1], true);
+    xhr.setRequestHeader("Content-Type", "application/json");
+
+    //zu sendenden Daten
+    // send the collected data as JSON
+    xhr.send(JSON.stringify(data));
+}

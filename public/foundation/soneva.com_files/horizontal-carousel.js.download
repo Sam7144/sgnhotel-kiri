@@ -1,0 +1,1 @@
+var horizontalScrollers=new Array();var horizontalSliders=document.getElementsByClassName("horizontal-slider");for(var i=0;i<horizontalSliders.length;i++){horizontalScrollers[i]=new MiniBar(horizontalSliders.item(i),{alwaysShowBars:true,scrollX:true,scrollY:false,minBarSize:100,navButtons:true,});}

@@ -1,0 +1,2 @@
+!(function($){$(function(){if($('.hero-carousel--slick').length>0){$('.hero-carousel--slick').each(function(){$(this).slick({arrows:false,dots:false,fade:true,autoplay:true,pauseOnHover:false,speed:1500,autoplaySpeed:4000,});});}
+if($(".vimeo-load").length>0&&$(window).width()>=992){$(".vimeo-load").each(function(){$(this).before('<iframe src="https://player.vimeo.com/video/'+$(this).data('id')+'?background=1&autoplay=1&loop=1&byline=0&title=0&muted=1" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>');});}});})(window.jQuery);

@@ -1,0 +1,1 @@
+var activityScrollers=new Array();var activitySliders=document.getElementsByClassName("activities-slider--scrollbar");for(var i=0;i<activitySliders.length;i++){activityScrollers[i]=new MiniBar(activitySliders.item(i),{alwaysShowBars:true,scrollX:true,scrollY:false,minBarSize:100,navButtons:true,scrollAmount:70,});}
