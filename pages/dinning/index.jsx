@@ -1,5 +1,5 @@
 import Image from 'next/image'
-import React from 'react'
+import React, { useState } from 'react'
 import Soneva from './dinning-components/Soneva'
 import Thai from './dinning-components/Thai'
 import Tuk from './dinning-components/Tuk'
@@ -11,8 +11,8 @@ import Wine from './dinning-components/Wine'
 function index() {
   return (
     <div className='wrapper mt-[230px]'>
-      <Image src='/dinning/heading.webp' width={400} height={400}
-      className='w-full  h-[400px]'
+      <Image src='/new/d1.jpg' width={400} height={600}
+      className='w-full  h-[500px]'
       alt=''></Image>
       <Soneva/>
       <Thai/>

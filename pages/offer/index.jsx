@@ -8,7 +8,7 @@ function index() {
         width="400"
         height="400"
         alt=""
-        src="/villa/l1.jpg"
+        src="/new/d5.jpg"
         className="w-full h-[400px] object-fill"
       />
       <h1 className="text-5xl text-center my-[50px]">

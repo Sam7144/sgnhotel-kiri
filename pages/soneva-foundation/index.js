@@ -13,7 +13,7 @@ function index() {
         width="400"
         height="400"
         alt=""
-        src="/foundation/f1.jpg"
+        src="/new/d2.jpg"
         className="w-full h-[400px]"
       />
       <h1 className="text-5xl text-center my-[50px]">Soneva Foundation</h1>

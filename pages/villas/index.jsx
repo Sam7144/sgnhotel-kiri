@@ -11,7 +11,7 @@ function index() {
         width="400"
         height="400"
         alt=""
-        src="/villa/l1.jpg"
+        src="/new/d4.jpg"
         className="w-full h-[400px] object-fill"
       />
       <h1 className="text-2xl text-center my-[50px]">Browse our</h1>
